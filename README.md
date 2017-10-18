@@ -44,4 +44,4 @@ Please refrain from using external libraries (by way of using CocoaPods and simi
 
     - [Reddit API](http://www.reddit.com/dev/api)
     - [Apigee](https://apigee.com/console/reddit)
-    - Example JSON file (Top.json) is listed.
+    - Example JSON file (top.json) is listed.
