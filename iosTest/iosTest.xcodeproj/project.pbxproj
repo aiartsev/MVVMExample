@@ -54,6 +54,9 @@
 		9535FFD21FDB2C3E00EE903E /* iosTest */ = {
 			isa = PBXGroup;
 			children = (
+				9535FFE71FDB2D1000EE903E /* Services */,
+				9535FFE61FDB2CF500EE903E /* Modules */,
+				9535FFE51FDB2CE700EE903E /* Model */,
 				9535FFD31FDB2C3E00EE903E /* AppDelegate.swift */,
 				9535FFD51FDB2C3E00EE903E /* ViewController.swift */,
 				9535FFD71FDB2C3E00EE903E /* Main.storyboard */,
@@ -62,6 +65,43 @@
 				9535FFDF1FDB2C3E00EE903E /* Info.plist */,
 			);
 			path = iosTest;
+			sourceTree = "<group>";
+		};
+		9535FFE51FDB2CE700EE903E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9535FFE61FDB2CF500EE903E /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				9535FFE91FDB2D4800EE903E /* EntryList */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		9535FFE71FDB2D1000EE903E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9535FFE81FDB2D1B00EE903E /* Networking */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		9535FFE81FDB2D1B00EE903E /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		9535FFE91FDB2D4800EE903E /* EntryList */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = EntryList;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
