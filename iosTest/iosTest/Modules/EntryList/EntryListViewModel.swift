@@ -65,24 +65,52 @@ class EntryListViewModel {
                         self?.alertMessage = "Unknown Error."
                     } else if let listing = topListing {
                         self?.prepareListing(listing)
+                    } else {
+                        self?.alertMessage = "Error Getting Top Listing"
                     }
-                    
-                    self?.alertMessage = "Error Getting Top Listing"
                 }
             }
         }
     }
     
+    func getCellViewModel(at indexPath: IndexPath) -> EntryListCellViewModel {
+        return cellViewModels[indexPath.row]
+    }
+    
     private func prepareListing(_  listing: TopListing) {
-        for entry in listing.entries {
-            print(entry.data)
+        for entryWrapper in listing.entries {
+            self.entryList.append(entryWrapper.data)
+            self.cellViewModels.append(EntryListCellViewModel(withEntry: entryWrapper.data))
         }
+        
+        self.reloadTableView?()
     }
 }
 
 class EntryListCellViewModel {
     
-    init(withEntry: RedditEntry) {
+    let titleText: String
+    let authorText: String
+    let thumbnailURL: String
+    let dateText: String
+    let commentsText: String
+    
+    init(withEntry entry: RedditEntry) {
+        self.titleText = entry.title
+        self.authorText = entry.author
+        self.thumbnailURL = entry.thumbnail
+        self.commentsText = "\(entry.comments) comments"
         
+        let date = Date(timeIntervalSince1970: entry.created)
+        
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.zeroFormattingBehavior = .dropAll
+        formatter.maximumUnitCount = 1
+        formatter.allowedUnits = [.year, .month, .weekOfMonth, .day, .hour, .minute, .second]
+        
+        let formatString = NSLocalizedString("%@ ago", comment: "")
+        let timeString = formatter.string(from: date, to: Date())
+        self.dateText = String(format: formatString, timeString!)
     }
 }
