@@ -46,8 +46,10 @@ class EntryListViewModel {
         self.redditApi = apiService
     }
     
-    func loadData() {
-        self.loading = true
+    func loadData(displayLoading: Bool = false) {
+        if displayLoading {
+            self.loading = true
+        }
         redditApi.getListings(afterEntry: lastEntryId) { [weak self] (success, topListing, error) in
             self?.loading = false
             if let error = error {

@@ -66,7 +66,7 @@ class EntryListViewController: UIViewController {
             }
         }
         
-        viewModel.loadData()
+        viewModel.loadData(displayLoading: true)
     }
     
     func display(alertMessage message: String) {
@@ -86,6 +86,10 @@ extension EntryListViewController: UITableViewDelegate, UITableViewDataSource {
         let cellViewModel = self.viewModel.getCellViewModel(at: indexPath)
         cell.viewModel = cellViewModel
  
+        if indexPath.row == viewModel.numberOfCells - 1 {
+            viewModel.loadData()
+        }
+        
         return cell
     }
     
