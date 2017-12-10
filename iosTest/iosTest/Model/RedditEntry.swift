@@ -13,6 +13,7 @@ struct RedditEntry: Codable {
     let author: String
     let created: Double
     let thumbnail: String
+    let image: String
     let comments: Int
     
     enum CodingKeys: String, CodingKey {
@@ -20,6 +21,7 @@ struct RedditEntry: Codable {
         case thumbnail
         case created
         case title
+        case image = "url"
         case comments = "num_comments"
     }
 }
