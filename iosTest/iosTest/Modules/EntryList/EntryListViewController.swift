@@ -76,6 +76,8 @@ class EntryListViewController: UIViewController {
                 self?.tableView.reloadData()
             }
         }
+        
+        viewModel.loadData()
     }
     
     func display(alertMessage message: String) {

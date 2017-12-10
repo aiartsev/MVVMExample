@@ -51,11 +51,14 @@ class EntryListViewModel {
         
         redditApi.authorize(deviceId: self.deviceId) { [weak self] (success, error) in
             if let error = error {
+                self?.loading = false
                 self?.alertMessage = error.localizedDescription
             } else if !success {
+                self?.loading = false
                 self?.alertMessage = "Unknown Authentication Error."
             } else {
                 self?.redditApi.getListings() { [weak self] (success, topListing, error) in
+                    self?.loading = false
                     if let error = error {
                         self?.alertMessage = error.localizedDescription
                     } else if !success {
@@ -71,7 +74,9 @@ class EntryListViewModel {
     }
     
     private func prepareListing(_  listing: TopListing) {
-        
+        for entry in listing.entries {
+            print(entry.data)
+        }
     }
 }
 
