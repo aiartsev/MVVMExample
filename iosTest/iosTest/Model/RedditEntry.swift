@@ -13,7 +13,7 @@ struct RedditEntry: Codable {
     let author: String
     let created: Double
     let thumbnail: String
-    let image: String
+    let image: String?
     let comments: Int
     
     enum CodingKeys: String, CodingKey {

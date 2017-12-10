@@ -84,17 +84,8 @@ extension EntryListViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         let cellViewModel = self.viewModel.getCellViewModel(at: indexPath)
-        
-        cell.titleLabel.text = cellViewModel.titleText
-        cell.authorLabel.text = cellViewModel.authorText
-        cell.dateLabel.text = cellViewModel.dateText
-        cell.commentsLabel.text = cellViewModel.commentsText
-        if let url = URL(string: cellViewModel.thumbnailURL) {
-            cell.thumbnailImageView.load(fromURL: url)
-        } else {
-            cell.thumbnailImageView.isHidden = true
-        }
-        
+        cell.viewModel = cellViewModel
+ 
         return cell
     }
     
@@ -106,21 +97,26 @@ extension EntryListViewController: UITableViewDelegate, UITableViewDataSource {
         return viewModel.numberOfCells
     }
     
-//    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 100.0
-//    }
-    
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 100.0
-//    }
-    
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        let cellViewModel = viewModel.getCellViewModel(at: indexPath)
+        let url = URL(string: cellViewModel.thumbnailURL)!
+        if !UIApplication.shared.canOpenURL(url) {
+            return nil
+        }
+        
+        if let image = cellViewModel.imageURL {
+            let imageURL = URL(string: image)!
+            UIApplication.shared.open(imageURL, options: [:])
+        }
+       
         return nil
     }
 }
 
 extension UIImageView {
     func load(fromURL url: URL) {
+        print(url)
+        self.image = nil
         let configuration = URLSessionConfiguration.ephemeral
         let session = URLSession(configuration: configuration, delegate: nil, delegateQueue: OperationQueue.main)
         let task = session.dataTask(with: url, completionHandler: {[weak self] (data: Data?, response: URLResponse?, error: Error?) -> Void in
@@ -140,4 +136,31 @@ class EntryListViewCell: UITableViewCell {
     @IBOutlet weak var authorLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var commentsLabel: UILabel!
+    
+    @IBOutlet weak var thumbnailLeftConstraint: NSLayoutConstraint!
+    @IBOutlet weak var thumbnailWidthConstraint: NSLayoutConstraint!
+    
+    var viewModel: EntryListCellViewModel? = nil {
+        didSet {
+            if let viewModel = self.viewModel {
+                self.titleLabel.text = viewModel.titleText
+                self.authorLabel.text = viewModel.authorText
+                self.commentsLabel.text = viewModel.commentsText
+                self.dateLabel.text = viewModel.dateText
+                
+                if let url = URL(string: viewModel.thumbnailURL) {
+                    if UIApplication.shared.canOpenURL(url) {
+                        self.thumbnailImageView.isHidden = false
+                        self.thumbnailLeftConstraint.constant = 0.0
+                        self.thumbnailWidthConstraint.constant = 75.0
+                        self.thumbnailImageView.load(fromURL: url)
+                    } else {
+                        self.thumbnailLeftConstraint.constant = -10.0
+                        self.thumbnailWidthConstraint.constant = 0.0
+                        self.thumbnailImageView.isHidden = true
+                    }
+                }
+            }
+        }
+    }
 }

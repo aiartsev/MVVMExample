@@ -92,6 +92,8 @@ class EntryListCellViewModel {
     let titleText: String
     let authorText: String
     let thumbnailURL: String
+    let validThumbnail: Bool
+    let imageURL: String?
     let dateText: String
     let commentsText: String
     
@@ -99,7 +101,9 @@ class EntryListCellViewModel {
         self.titleText = entry.title
         self.authorText = entry.author
         self.thumbnailURL = entry.thumbnail
+        self.validThumbnail  = false
         self.commentsText = "\(entry.comments) comments"
+        self.imageURL = entry.image
         
         let date = Date(timeIntervalSince1970: entry.created)
         
