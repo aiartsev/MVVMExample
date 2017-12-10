@@ -14,8 +14,9 @@ class EntryListViewModel {
     var showAlert: (()->())?
     var updateLoadingStatus: (()->())?
     
-    let redditApi: APIService
-    let deviceId: String
+    let redditApi: RedditAPI
+ 
+    var lastEntryId: String?
     
     private var entryList: [RedditEntry] = [RedditEntry]()
     
@@ -41,34 +42,22 @@ class EntryListViewModel {
         return cellViewModels.count
     }
     
-    init(withDeviceId id: String, withAPIService apiService: APIService = RedditAPI()) {
+    init(withAPIService apiService: RedditAPI) {
         self.redditApi = apiService
-        self.deviceId = id
     }
     
     func loadData() {
         self.loading = true
-        
-        redditApi.authorize(deviceId: self.deviceId) { [weak self] (success, error) in
+        redditApi.getListings(afterEntry: lastEntryId) { [weak self] (success, topListing, error) in
+            self?.loading = false
             if let error = error {
-                self?.loading = false
                 self?.alertMessage = error.localizedDescription
             } else if !success {
-                self?.loading = false
-                self?.alertMessage = "Unknown Authentication Error."
+                self?.alertMessage = "Unknown Error."
+            } else if let listing = topListing {
+                self?.prepareListing(listing)
             } else {
-                self?.redditApi.getListings() { [weak self] (success, topListing, error) in
-                    self?.loading = false
-                    if let error = error {
-                        self?.alertMessage = error.localizedDescription
-                    } else if !success {
-                        self?.alertMessage = "Unknown Error."
-                    } else if let listing = topListing {
-                        self?.prepareListing(listing)
-                    } else {
-                        self?.alertMessage = "Error Getting Top Listing"
-                    }
-                }
+                self?.alertMessage = "Error Getting Top Listing."
             }
         }
     }
@@ -83,6 +72,7 @@ class EntryListViewModel {
             self.cellViewModels.append(EntryListCellViewModel(withEntry: entryWrapper.data))
         }
         
+        self.lastEntryId = listing.after
         self.reloadTableView?()
     }
 }

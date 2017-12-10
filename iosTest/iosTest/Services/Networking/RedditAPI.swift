@@ -8,12 +8,7 @@
 
 import Foundation
 
-protocol APIService {
-    func authorize(deviceId uuid: String, withCompletion completion: @escaping ( _ success: Bool, _ error: Error? ) -> ())
-    func getListings(withCompletion completion: @escaping (_ success: Bool, _ listing: TopListing?,  _ error: Error?)  -> ())
-}
-
-class RedditAPI: APIService {
+class RedditAPI {
     let GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client"
     let USER_NAME = "-DBHvhMD--SHKg:"
     let POST = "POST"
@@ -23,7 +18,13 @@ class RedditAPI: APIService {
     let HOST = "https://www.reddit.com/"
     let AUTH_URI = "api/v1/access_token"
     
+    let uuid: String
+    
     var accessToken: AccessToken?
+    
+    init (withDeviceId id: String) {
+        self.uuid = id
+    }
     
     func authorize(deviceId uuid: String, withCompletion completion: @escaping (Bool, Error?) -> ()) {
         let session = URLSession(configuration: .ephemeral)
@@ -58,40 +59,55 @@ class RedditAPI: APIService {
         task.resume()
     }
     
-    func getListings(withCompletion completion: @escaping (Bool, TopListing?, Error?) -> ()) {
-        guard let token = self.accessToken?.token else {
-            //TODO: Add token renewal logic
-            completion(false, nil, nil)
-            return
+    func getListings(afterEntry: String?, withCompletion completion: @escaping (Bool, TopListing?, Error?) -> ()) {
+        if let accessToken = self.accessToken {
+            if (!accessToken.expired) {
+                let session = URLSession(configuration: .ephemeral)
+                
+                var urlString = "https://oauth.reddit.com/top"
+                
+                if let entryId = afterEntry {
+                   urlString = urlString.appending("?after=\(entryId)")
+                }
+                
+                let url = URL(string: urlString)!
+                
+                var request = URLRequest(url: url)
+                request.httpMethod = "GET"
+                
+                request.setValue("Bearer \(accessToken.token)", forHTTPHeaderField: AUTHORIZATION)
+                request.setValue(URL_ENCODED, forHTTPHeaderField: CONTENT_TYPE)
+                
+                let task = session.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?)  -> Void in
+                    guard let data = data else {
+                        completion(false, nil, error)
+                        return
+                    }
+                    
+                    do  {
+                        let decoder = JSONDecoder()
+                        let listingWrapper = try decoder.decode(ListingWrapper.self, from: data)
+                        completion(true, listingWrapper.data, error)
+                        return
+                    } catch let error {
+                        completion(false, nil, error)
+                        print(error.localizedDescription)
+                        return
+                    }
+                })
+                
+                task.resume()
+                return
+            }
         }
         
-        let session = URLSession(configuration: .ephemeral)
-        let url = URL(string: "https://oauth.reddit.com/top")!
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        request.setValue("Bearer \(token)", forHTTPHeaderField: AUTHORIZATION)
-        request.setValue(URL_ENCODED, forHTTPHeaderField: CONTENT_TYPE)
-        
-        let task = session.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?)  -> Void in
-            guard let data = data else {
+        self.authorize(deviceId: uuid) { [weak self] (success, error) in
+            if let error = error {
                 completion(false, nil, error)
                 return
             }
             
-            do  {
-                let decoder = JSONDecoder()
-                let listingWrapper = try decoder.decode(ListingWrapper.self, from: data)
-                completion(true, listingWrapper.data, error)
-                return
-            } catch let error {
-                completion(false, nil, error)
-                print(error.localizedDescription)
-                return
-            }
-        })
-        
-        task.resume()
+            self?.getListings(afterEntry: afterEntry, withCompletion: completion)
+        }
     }
 }

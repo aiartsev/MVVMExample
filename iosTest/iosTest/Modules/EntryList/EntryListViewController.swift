@@ -15,7 +15,7 @@ class EntryListViewController: UIViewController {
     
     lazy var viewModel: EntryListViewModel = {
         let uuid = UIDevice.current.identifierForVendor!.uuidString
-        return EntryListViewModel(withDeviceId: uuid)
+        return EntryListViewModel(withAPIService: RedditAPI(withDeviceId: uuid))
     }()
     
     override func viewDidLoad() {
@@ -115,7 +115,6 @@ extension EntryListViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension UIImageView {
     func load(fromURL url: URL) {
-        print(url)
         self.image = nil
         let configuration = URLSessionConfiguration.ephemeral
         let session = URLSession(configuration: configuration, delegate: nil, delegateQueue: OperationQueue.main)
