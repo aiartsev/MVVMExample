@@ -12,6 +12,7 @@ struct AccessToken: Codable {
     let token: String
     let deviceId: String
     let expiresIn: Int
+    let createdAt: Date  = Date()
     
     enum CodingKeys: String, CodingKey {
         case token = "access_token"
@@ -21,11 +22,14 @@ struct AccessToken: Codable {
 }
 
 extension AccessToken {
-    //TODO: Add check later to see if AccessToken expired
-    
     var expired: Bool {
         get {
-            return true
+            let timeDifference = Calendar.current.dateComponents([.second], from: createdAt, to: Date())
+            
+            guard let seconds = timeDifference.second else {
+                return true
+            }
+            return seconds > expiresIn
         }
     }
 }
