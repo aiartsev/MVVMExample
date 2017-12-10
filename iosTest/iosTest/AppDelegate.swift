@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  iosTest
 //
-//  Created by InAllMedia on 08/12/2017.
+//  Created by Alex Iartsev on 08/12/2017.
 //  Copyright © 2017 Alex Iartsev. All rights reserved.
 //
 
@@ -40,7 +40,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
-
